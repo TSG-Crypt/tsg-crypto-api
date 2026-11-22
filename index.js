@@ -1,6 +1,6 @@
 import express from "express";
 import { paymentMiddleware, x402ResourceServer } from "@x402/express";
-import { HTTPFacilitatorClient } from "@x402/core/server";
+import { createCdpFacilitatorClient } from "@coinbase/cdp-sdk/x402";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 
 const app = express();
@@ -22,10 +22,12 @@ app.get("/health", (_req, res) => {
 });
 
 const payTo = process.env.PAY_TO;
-const facilitatorUrl = process.env.FACILITATOR_URL;
+const hasCdpCredentials = Boolean(
+  process.env.CDP_API_KEY_ID && process.env.CDP_API_KEY_SECRET
+);
 
-if (payTo && facilitatorUrl) {
-  const facilitator = new HTTPFacilitatorClient({ url: facilitatorUrl });
+if (payTo && hasCdpCredentials) {
+  const facilitator = createCdpFacilitatorClient();
   const resourceServer = new x402ResourceServer(facilitator)
     .register("eip155:8453", new ExactEvmScheme());
 
@@ -89,7 +91,7 @@ if (payTo && facilitatorUrl) {
     }
   });
 } else {
-  console.warn("Paid endpoint is not enabled. Set PAY_TO and FACILITATOR_URL.");
+  console.warn("Paid endpoint disabled. Set PAY_TO, CDP_API_KEY_ID, and CDP_API_KEY_SECRET.");
 }
 
 if (process.env.VERCEL !== "1") {
