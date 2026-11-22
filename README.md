@@ -11,10 +11,22 @@ A small Express API that serves cryptocurrency spot prices through an x402 payme
 ## Environment variables
 
 - `PAY_TO` — public EVM wallet address that receives payments on Base.
-- `FACILITATOR_URL` — URL of an x402 facilitator that supports Base mainnet (`eip155:8453`).
+- `CDP_API_KEY_ID` — Coinbase Developer Platform API key ID.
+- `CDP_API_KEY_SECRET` — Coinbase Developer Platform API key secret. Keep this private.
 
-Copy `.env.example` to `.env` for local development and fill in the values. Never commit `.env` or private keys.
+The paid endpoint is enabled only when all three variables are configured. It uses the authenticated Coinbase CDP-hosted x402 facilitator and accepts exact USDC payments on Base mainnet (`eip155:8453`).
 
-The paid endpoint is enabled only when both variables are configured. It charges **$0.001 USDC per request**.
+The endpoint charges **$0.001 USDC per request**.
 
 Market data is retrieved from CoinGecko's public simple-price endpoint.
+
+## Local development
+
+Copy `.env.example` to `.env`, fill in the CDP credentials from the Coinbase Developer Platform, then run:
+
+```bash
+npm install
+npm start
+```
+
+Never commit `.env`, API secrets, or private keys.
